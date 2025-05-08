@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/Rohit-kb07/Mywebansible.git'
+                git branch: 'master', url: 'https://github.com/ShruthiBGowda/MavenAnsibleWebApp.git'
             }
         }
 
@@ -29,10 +29,12 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-               sh 'mvn clean install'  
+               sh 'mvn clean package'  
                sh 'ansible-playbook ansible/playbook.yml -i ansible/hosts.ini'
             }
         }
 
                   
     }
+
+   }
