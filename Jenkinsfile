@@ -1,38 +1,40 @@
 pipeline {
- agent any
- tools {
- maven 'Maven-3.6.3' // Make sure Maven version is configured in Jenkins global tools
- }
- 
- stages {
- stage('Checkout') {
- steps {
- git 'https://github.com/Rohit-kb07/Mywebansible.git'
- }
- }
- stage('Build') {
- steps {
- sh 'mvn clean install' // Build the Maven project
- }
- }
- stage('Archive Artifacts') {
- steps {
- archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
- }
- }
- stage('Deploy') {
- steps {
- ansiblePlaybook playbook: 'playbook.yml', inventory: 'hosts.ini' // Run the Ansible
+    agent any  // Use any available agent
+    
+    environment {
+        LANG = 'en_US.UTF-8'
+        LC_ALL = 'en_US.UTF-8'
+    }   // this has to be added only if you get an error saying UTF required is 8 but showing in ISO00009
 
- }
- }
- }
- post {
- success {
- echo 'Build and deploy completed successfully!'
- }
- failure {
- echo 'Build failed!'
- }
- }
-}
+    tools {
+        maven 'Maven'  // Ensure this matches the name configured in Jenkins
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master', url: 'https://github.com/ShruthiBGowda/MavenAnsibleWebApp.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'  // Run Maven build
+            }
+        }
+
+     stage('Archive') {
+            steps {
+                archiveArtifacts artifacts: 'target/*.war', fingerprint:true
+            }
+        }
+        stage('Deploy') {
+            steps {
+               sh 'mvn clean package'  
+               sh 'ansible-playbook ansible/playbook.yml -i ansible/hosts.ini'
+            }
+        }
+
+                  
+    }
+
+   }
